@@ -1,0 +1,190 @@
+{
+    "persons": [
+        {
+            "name": "Bruno Abakanowicz",
+            "years": "(1852-1900)",
+            "fnames": [
+                "Bruno"
+            ],
+            "lnames": [
+                "Abakanowicz"
+            ],
+            "volume": "1",
+            "file": "Abakanowicz_Abdank_Bruno.txt",
+            "autor": [
+                {
+                    "autor_name": "Marian Grotowski",
+                    "autor_years": "(1882-1951)"
+                }
+            ],
+            "publ_year": "1935",
+            "page": "s. 1-2",
+            "start_of_bio": "Abakanowicz Abdank Bruno (1852–1900).",
+            "date_of_birth": "06-10-1852",
+            "date_of_death": "29-08-1900",
+            "place_of_birth": "Wiłkomierzu",
+            "place_of_death": "Kraków",
+            "lista_bb": "Abakanowicz Bruno (1852-1900)",
+            "id_bn": "9810594516005606",
+            "bn_opis": "Polski inżynier dróg i mostów, matematyk, wynalazca, elektrotechnik, konstruktor urządzeń matematycznych (m.in. integratora).",
+            "viaf": "https://viaf.org/viaf/162012354",
+            "file_new": "Abakanowicz_Abdank_Bruno.txt",
+            "relationships": null,
+            "description_pl": "(1852-1900) Polski inżynier dróg i mostów, matematyk, wynalazca, elektrotechnik, konstruktor urządzeń matematycznych (m.in. integratora).",
+            "description_en": "(1852-1900) Polish road and bridge engineer, mathematician, inventor, electrical engineer, constructor of mathematical devices (including an integrator).",
+            "bn_years": "(1852-1900)",
+            "bn_400": [
+                "Abakanowicz, Bruno",
+                "Abdank Abakanowicz, Bruno",
+                "Abakanowicz, Bruno Abdank-"
+            ],
+            "ID": "PSB-01-0001"
+        },
+        {
+            "name": "Franciszek d’Abancourt de Franqueville",
+            "years": "(1815-1892)",
+            "fnames": [
+                "Franciszek"
+            ],
+            "lnames": [
+                "d’Abancourt de Franqueville"
+            ],
+            "volume": "1",
+            "file": "d’Abancourt_de_Franqueville.txt",
+            "autor": [
+                {
+                    "autor_name": "Helena d’Abancourt",
+                    "autor_years": "(1874-1942)"
+                }
+            ],
+            "publ_year": "1935",
+            "page": "s. 2-3",
+            "start_of_bio": "d’Abancourt de Franqueville Franciszek Ksawery (1815–1892), publicysta, działacz narodowy i polityczny, urodził się 28 I 1815 r. w Lisku, dokąd w czasie W.",
+            "date_of_birth": "DD-MM-1815",
+            "date_of_death": "DD-MM-1892",
+            "place_of_death": "Bolechów",
+            "lista_bb": "d’Abancourt de Franqueville Franciszek (1815-1892)",
+            "id_bn": "9810632559105606",
+            "bn_opis": "Publicysta, działacz narodowy i polityczny.",
+            "viaf": "http://viaf.org/viaf/165760458",
+            "relationships": null,
+            "file_new": "d_Abancourt_de_Franqueville.txt",
+            "description_pl": "(1815-1892) Publicysta, działacz narodowy i polityczny.",
+            "description_en": "(1815-1892) Publicist, national and political activist.",
+            "bn_years": "(1815-1892)",
+            "bn_400": [
+                "Abancourt, Franciszek Xawery d'",
+                "D'Abancourt de Franqueville, Franciszek Ksawery"
+            ],
+            "ID": "PSB-01-0002"
+        },
+        {
+            "name": "Karol d’Abancourt de Franqueville",
+            "years": "(1811-1849)",
+            "fnames": [
+                "Karol"
+            ],
+            "lnames": [
+                "d’Abancourt de Franqueville"
+            ],
+            "volume": "1",
+            "file": "d’Abancourt_de_Franqueville_1.txt",
+            "autor": [
+                {
+                    "autor_name": "Helena d’Abancourt",
+                    "autor_years": "(1874-1942)"
+                }
+            ],
+            "publ_year": "1935",
+            "page": "s. 3",
+            "start_of_bio": "d’Abancourt de Franqueville Karol (1811–1849), uczestnik walk w r. 1848, brat Fr. Ksawerego.",
+            "date_of_birth": "DD-MM-1811",
+            "date_of_death": "DD-MM-1849",
+            "lista_bb": "d’Abancourt de Franqueville Karol (1811-1849)",
+            "relationships": null,
+            "file_new": "d_Abancourt_de_Franqueville_1.txt",
+            "occupation": [
+                "uczestnik walk w r. 1848"
+            ],
+            "description_pl": "(1811-1849) uczestnik walk w r. 1848",
+            "description_en": "(1811-1849) participant in the fighting in 1848",
+            "ID": "PSB-01-0003"
+        },
+        {
+            "name": "Karol d’Abancourt de Franqueville",
+            "years": "(1851-1913)",
+            "fnames": [
+                "Karol"
+            ],
+            "lnames": [
+                "d’Abancourt de Franqueville"
+            ],
+            "volume": "1",
+            "file": "d’Abancourt_de_Franqueville_2.txt",
+            "autor": [
+                {
+                    "autor_name": "Helena d’Abancourt",
+                    "autor_years": "(1874-1942)"
+                }
+            ],
+            "publ_year": "1935",
+            "page": "s. 3-4",
+            "start_of_bio": "d’Abancourt de Franqueville Karol (1851–1913), poseł na Sejm Galicyjski i działacz społeczny.",
+            "date_of_birth": "26-05-1851",
+            "date_of_death": "DD-MM-1913",
+            "place_of_birth": "Łówczy",
+            "place_of_death": "Rabiec",
+            "occupation": [
+                "poseł na Sejm Galicyjski i działacz społeczny"
+            ],
+            "lista_bb": "d’Abancourt de Franqueville Karol (1851-1913)",
+            "file_new": "d_Abancourt_de_Franqueville_2.txt",
+            "relationships": null,
+            "description_pl": "(1851-1913) poseł na Sejm Galicyjski i działacz społeczny",
+            "description_en": "(1851-1913) member of the Galician Parliament and social activist",
+            "ID": "PSB-01-0004"
+        },
+        {
+            "name": "Julia Alina Józefa Świderska",
+            "years": "(1875-1963)",
+            "fnames": [
+                "Julia",
+                "Alina",
+                "Józefa"
+            ],
+            "lnames": [
+                "Świderska"
+            ],
+            "volume": "51",
+            "file": "Świderska Julia.txt",
+            "autor": [
+                {
+                    "autor_name": "Maria Kotowska-Kachel",
+                    "autor_years": "(1950- )"
+                }
+            ],
+            "publ_year": "2016-17",
+            "page": "s. 226-229",
+            "start_of_bio": "Świderska Julia Alina Józefa, pseud. i krypt.",
+            "date_of_birth": "13-01-YYYY",
+            "date_of_death": "12-01-1963",
+            "date_of_burial": "15-01-1963",
+            "place_of_birth": "Kraków",
+            "place_of_death": "Kraków",
+            "place_of_burial": "grobie rodzinny na cmentarzu Rakowickim",
+            "nickname": [
+                "A.S.",
+                "A.Ś.",
+                "Al. S-a",
+                "Al.-ska",
+                "Al-ska"
+            ],
+            "lista_bb": "Świderska Julia Alina Józefa (1875-1963)",
+            "relationships": null,
+            "file_new": "Swiderska_Julia.txt",
+            "description_pl": "pisarka, tłumaczka, publicystka",
+            "description_en": "writer, translator, publicist",
+            "ID": "PSB-51-0120"
+        }
+    ]
+}
