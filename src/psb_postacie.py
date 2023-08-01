@@ -20,10 +20,9 @@ from wikibaseintegrator.wbi_exceptions import MWApiError
 from wikibaseintegrator.wbi_enums import ActionIfExists, WikibaseSnakType
 from psbtools import DateBDF
 import roman as romenum
-#from wikibaseintegrator.models.snaks import Snak
 
 # czy zapis do wikibase czy tylko test
-WIKIBASE_WRITE = True
+WIKIBASE_WRITE = False
 
 warnings.filterwarnings("ignore")
 
@@ -91,27 +90,8 @@ class Postac:
         self.name = postac_dict['name']
         # identyfikator wikibase QID
         self.qid = postac_dict.get('QID', '')
-
+        # lata życia z listy BB
         self.years = postac_dict.get('years', '')
-
-        # self.years_start = None
-        # self.years_end = None
-
-        # if self.years:
-        #     # pomocnicze pola z rokiem urodzin i śmierci do uzupełniania braków w
-        #     # danych Clarin (daty z YYYY)
-        #     years = self.years.replace('(','').replace(')','').strip()
-        #     tmp = years.split('-')
-        #     if len(tmp) != 2:
-        #         if 'zm' in years or 'um.' in years:
-        #             self.years_end = years.replace('zm.','').replace('um.','').strip()
-        #         elif 'ur.' in years:
-        #             self.years_start = years.replace('ur.','').strip()
-        #         else:
-        #             print('WARNING:', years)
-        #     else:
-        #         self.years_start = tmp[0].strip()
-        #         self.years_end = tmp[1].strip()
 
         self.description_pl = postac_dict.get('description_pl', '')
         self.description_en = postac_dict.get('description_en', '')
@@ -119,9 +99,10 @@ class Postac:
         # aliasy z BN, czyli referencja w 'stated as' będzie do BN, nie PSB
         self.aliasy = postac_dict.get('bn_400', [])
 
+        # dane z dokładnymi datami są niepewne
         self.date_of_birth = postac_dict.get('date_of_birth', '')
         self.date_of_death = postac_dict.get('date_of_death', '')
-        # dane z dokładnymi datami są niepewne
+
         self.years_start = ''
         self.years_end = ''
         self.years = self.years.replace('(','').replace(')','').strip()
@@ -140,28 +121,6 @@ class Postac:
             self.years_start = ''
         if self.years_end and not self.years_end.isnumeric():
             self.years_end = ''
-
-        if self.date_of_birth:
-            if 'około' in self.date_of_birth:
-                self.date_of_birth = self.date_of_birth.replace('około','').strip()
-                self.date_of_birth_uncertain = True
-            b_date = self.date_of_birth[6:] + '-00-00'
-            self.date_of_birth = b_date
-            if self.date_of_birth.startswith('YYYY') and self.years_start:
-                self.date_of_birth = self.date_of_birth.replace('YYYY', self.years_start)
-            if self.date_of_birth[:4] not in self.years:
-                self.date_of_birth = ''
-
-        if self.date_of_death:
-            if 'około' in self.date_of_death:
-                self.date_of_death = self.date_of_death.replace('około','').strip()
-                self.date_of_death_uncertain = True
-            d_date = self.date_of_death[6:] + '-00-00'
-            self.date_of_death= d_date
-            if self.date_of_death.startswith('YYYY') and self.years_end:
-                self.date_of_death = self.date_of_death.replace('YYYY', self.years_end)
-            if self.date_of_death[:4] not in self.years:
-                self.date_of_death = ''
 
         # lata życia postaci z deskryptora BN
         self.bn_years = postac_dict.get('bn_years', '')
@@ -300,8 +259,13 @@ class Postac:
     def date_from_bn(self):
         """ metoda przetwarza lata życia z deskryptora BN na daty do pól
             date of birth, date of death
+            Daty niepewne lub przybliżone w deskryptorach BN są zapisywane
+            w formacie EDTF (Extended Date/Time Format) Level 1,
+            ale tylko jeżeli pochodzą z pola MARC21 '046' (mniejszość), jeżeli
+            pochodzą z pola '100d' (zdecydowana większość) wówczas stosowane są
+            opisy słowne np. ok., urodzony, zmarł, czynny, ?, przed, po, lub,
+            ca, post, non ante i inne.
         """
-        # ~ ? ok. ca po 16.. 1855-06-05 uu przed post non ante 1562/1563 fl. ca 1800%
         if self.bn_years.count('-') > 1:
             tmp = self.bn_years.split(' - ')
         else:
@@ -474,8 +438,9 @@ class Postac:
             self.wb_item.claims.add([statement], action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
 
         # W celu uzyskania daty urodzenia i śmierci przetwarzane są lata życia z nawiasów.
-        # Dane z Clarin zawierają błędy (daty dzienne połączone z przypadkowymi rocznymi,
-        # lub brak rocznych) dlatego na razie je pomijamy
+        # Dane z datami dokładnymi zawierają błędy (daty dzienne połączone z przypadkowymi rocznymi,
+        # prawidłowe roczne połączone z przypadkowymi dziennymi, lub brak istniejących dat
+        # rocznych) dlatego na razie je pomijamy, będą w przyszłości wyciągane przez GPT
 
         separator = ',' if ',' in self.years else '-'
         date_of_1 = date_of_2 = None
@@ -521,11 +486,11 @@ class Postac:
 
         # ALIASY i STATED AS
         if self.aliasy:
-            # wszystkie do j. polskiego, w aliasach nie ma języka 'und'?
+            # wszystkie aliasy do j. polskiego, w aliasach naszej instancji testowej nie ma języka 'und'?
             self.wb_item.aliases.set(language='pl', values=self.aliasy, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
             # stated as
             for alias in self.aliasy:
-                # dodawać z językiem 'und' lub 'mul'
+                # dodawać statement z językiem 'und' lub 'mul'
                 statement = MonolingualText(text=alias, language='und',
                                             prop_nr=P_STATED_AS, references=self.reference_bn)
                 self.wb_item.claims.add([statement], action_if_exists=ActionIfExists.FORCE_APPEND)
@@ -534,31 +499,12 @@ class Postac:
         self.wb_item.claims.add([statement], action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
 
         # DESCRIBED BY SOURCE
-        data_publikacji = ''
-        data_publikacji_2 = ''
-        if self.publ_year.isnumeric():
-            data_publikacji = f'+{self.publ_year}-01-01T00:00:00Z'
-        else:
-            if '-' in self.publ_year:
-                # na razie w przypadku zakresu dat dajemy dwie daty
-                tmp_publ_year = self.publ_year.split('-')
-                year_publ_start = tmp_publ_year[0].strip()
-                year_publ_end = tmp_publ_year[1].strip()
-                data_publikacji = f'+{year_publ_start}-01-01T00:00:00Z'
-                data_publikacji_2 = f'+{year_publ_end}-01-01T00:00:00Z'
-            else:
-                print('ERROR:', self.publ_year)
-
         author_list = self.prepare_authors()
 
         psb_qualifiers = [String(value=self.volume, prop_nr=P_VOLUME),
                           String(value=self.page, prop_nr=P_PAGES),
-                          Time(prop_nr=P_PUBLICATION_DATE, time=data_publikacji, precision=WikibaseDatePrecision.YEAR),
                           MonolingualText(text=self.incipit, language='pl', prop_nr=P_INCIPIT)
                           ]
-
-        if data_publikacji_2:
-            psb_qualifiers.append(Time(prop_nr=P_PUBLICATION_DATE, time=data_publikacji_2, precision=WikibaseDatePrecision.YEAR))
 
         if author_list:
             psb_qualifiers += author_list
@@ -605,7 +551,7 @@ class Postac:
 
     def appears_in_wikibase(self) -> bool:
         """ proste wyszukiwanie elementu w wikibase, dokładna zgodność imienia i nazwiska
-            lata życia
+            oraz lata życia
         """
         f_result = False
 
@@ -616,34 +562,49 @@ class Postac:
             wbi_item = self.wbi.item.get(entity_id=item)
             item_label = wbi_item.labels.get(language='pl')
             item_alias = wbi_item.aliases.get(language='pl')
+            item_description_pl = wbi_item.descriptions.get(language='pl')
 
+            if ((item_label == self.name or (item_alias and self.name in item_alias)) and
+                (item_description_pl and item_description_pl == self.description_pl)):
+                self.qid = item
+                return True
+
+            # jeżeli nie ma pełnej zgodności z label i description, szukanie zgodności
+            # label i lat życia w statements
             claim_dict = wbi_item.claims.get_json()
 
-            d_birth = None
+            d_birth = []
             if P_DATE_OF_BIRTH in claim_dict:
                 lista = wbi_item.claims.get(P_DATE_OF_BIRTH)
 
                 # uproszczenie, zakładam że w momencie importu mamy tylko po 1 dacie dla osoby
                 if lista:
-                    d_birth = lista[0].mainsnak.datavalue['value']['time'][1:5]
+                    for birth_item in lista:
+                        if 'value' in birth_item.mainsnak.datavalue:
+                            d_birth.append(birth_item.mainsnak.datavalue['value']['time'][1:5])
 
-            d_death = None
+            d_death = []
             if P_DATE_OF_DEATH in claim_dict:
                 lista = wbi_item.claims.get(P_DATE_OF_DEATH)
                 # uproszczenie, zakładam że w momencie mamy tylko po 1 dacie dla osoby
                 if lista:
-                    d_death = lista[0].mainsnak.datavalue['value']['time'][1:5]
+                    for death_item in lista:
+                        if 'value' in death_item.mainsnak.datavalue:
+                            d_death.append(death_item.mainsnak.datavalue['value']['time'][1:5])
+
+            # Jeżeli nie ma dat dokładnych to szukamy floruit
             floruit = None
             if not d_birth and not d_death and P_FLORUIT in claim_dict:
                 lista = wbi_item.claims.get(P_FLORUIT)
                 # uproszczenie, zakładam że w momencie mamy tylko po 1 dacie dla osoby
                 if lista:
-                    floruit = lista[0].mainsnak.datavalue['value']['time'][1:3]
-                    floruit = str(romenum.toRoman(floruit))
+                    if 'value' in lista[0].mainsnak.datavalue:
+                        floruit = lista[0].mainsnak.datavalue['value']['time'][1:3]
+                        floruit = str(romenum.toRoman(int(floruit)))
 
             if ((item_label == self.name or (item_alias and self.name in item_alias)) and
-                ((not d_birth and floruit and floruit in self.years) or d_birth == self.date_of_birth[:4]) and
-                ((not d_death and floruit and floruit in self.years) or d_death == self.date_of_death[:4]) ):
+                ((not d_birth and floruit and floruit in self.years) or self.date_of_birth[:4] in d_birth) and
+                ((not d_death and floruit and floruit in self.years) or self.date_of_death[:4] in d_death)):
                 f_result = True
                 self.qid = item
                 break
@@ -723,10 +684,19 @@ if __name__ == '__main__':
 
     wbi = WikibaseIntegrator(login=login_instance)
 
-    #input_path = Path("..") / "data" / "postacie.json"
-    input_path = '/home/piotr/ihpan/psb_import/data/probka_postacie.json'
-    #input_path = '/home/piotr/ihpan/psb_import/data/postacie.json'
+    # realne dane
+    input_path = Path("..") / "data" / "postacie.json"
+
+    # próbka do testów
+    #input_path = '/home/piotr/ihpan/psb_import/data/probka_postacie_2.json'
+
+    # ścieżka do pliku json z danymi postaci z przypisanymi identyfikatorami wikibase (QID)
+    # ten plik stanie się nową wersją pliku postacie.json i ułatwi późniejsze uzupełnianie danych
+    # w wikibase (uwaga: wersje dla wiki testowej i produkcyjnej będą miały inne identyfikatory)
     output_path = Path("..") / "data" / "postacie_qid.json"
+
+    # ścieżka do pliku tymczasowego do zapisu identyfikatorów QID w razie przerwania skryptu
+    # (brak prądu, problemy sieciowe itp.), na podstawie tego pliku mozna uzupełnić dane w postacie.json
     output_tmp_path = Path("..") / "data" / "tmp_qid_list.csv"
 
     with open(input_path, "r", encoding='utf-8') as f:
@@ -736,10 +706,8 @@ if __name__ == '__main__':
             # utworzenie instancji obiektu postaci
             postac = Postac(postac_record, logger_object=logger, login_object=login_instance,
                           wbi_object=wbi)
-            # with open('/home/piotr/ihpan/psb_import/data/years.csv', 'a',encoding='utf-8') as f_years:
-            #     f_years.write(f'{postac.years}@{postac.years_start}@{postac.years_end}\n')
-            # print(f'{postac.years}@{postac.years_start}@{postac.years_end}')
 
+            # jeżeli nie ma postaci w wikibase
             if not postac.qid and not postac.appears_in_wikibase():
                 postac.create_item()
                 if WIKIBASE_WRITE:
@@ -748,6 +716,7 @@ if __name__ == '__main__':
                     postac.qid = 'TEST'
 
                 message = f'({i}) Dodano element: # [https://prunus-208.man.poznan.pl/wiki/Item:{postac.qid} {postac.name}]'
+            # jeżeli jest to próba uzupełnienia danych
             else:
                 message = f'({i}) Element istnieje: # [https://prunus-208.man.poznan.pl/wiki/Item:{postac.qid} {postac.name}]'
                 postac.create_item(update_qid=postac.qid)
@@ -764,6 +733,7 @@ if __name__ == '__main__':
             # zapis w logu
             logger.info(message)
 
+    # zapis pliku json z identyfikatorami wikibase (QID)
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(json_data, f, indent=4, ensure_ascii=False)
 

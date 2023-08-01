@@ -18,14 +18,14 @@ class DateBDF:
     P_INFORMATION_STATUS = 'P458'
     P_FLORUIT = 'P444'
 
-    # uaktualnić dla instancji testowej!
-    Q_CIRCA = 'Q37979'
-    Q_FIRST_HALF = 'Q40688'
-    Q_SECOND_HALF = 'Q41336'
-    Q_BEGINNING_OF = 'Q41337'
-    Q_MIDDLE_OF = 'Q41338'
-    Q_END_OF = 'Q41339'
-    Q_FIRST_QUARTER = 'Q49427'
+    # uaktualnić dla instancji testowej/docelowej!
+    Q_CIRCA = 'Q233831'
+    Q_FIRST_HALF = 'Q233821'
+    Q_SECOND_HALF = 'Q233822'
+    Q_BEGINNING_OF = 'Q233819'
+    Q_MIDDLE_OF = 'Q233818'
+    Q_END_OF = 'Q233820'
+    Q_FIRST_QUARTER = 'Q233823'
 
     def __init__(self, text:str, typ:str = '') -> None:
         """ init, typ - B data urodzenia, D - data śmierci """
@@ -310,13 +310,13 @@ class DateBDF:
 
             format_time =  f'+{year}-{month}-{day}T00:00:00Z'
 
-            print(format_time)
-            print(precision)
+            #print(format_time)
+            #print(precision)
             return Time(prop_nr=prop, time=format_time, precision=precision,
                     references=ref, qualifiers=qlf_list)
 
 
-    def prepare_st(self, ref=None) -> Time:
+    def prepare_st(self, ref=None):
         """ tworzy deklaracje (statements) na podstawie daty"""
         print_date = print_date_2 = print_kw_date = print_kw_date_2 = ''
 
