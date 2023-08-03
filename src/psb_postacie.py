@@ -22,7 +22,7 @@ from psbtools import DateBDF
 import roman as romenum
 
 # czy zapis do wikibase czy tylko test
-WIKIBASE_WRITE = False
+WIKIBASE_WRITE = True
 
 warnings.filterwarnings("ignore")
 
@@ -93,8 +93,8 @@ class Postac:
         # lata życia z listy BB
         self.years = postac_dict.get('years', '')
 
-        self.description_pl = postac_dict.get('description_pl', '')
-        self.description_en = postac_dict.get('description_en', '')
+        self.description_pl = postac_dict.get('description_pl', '').strip()
+        self.description_en = postac_dict.get('description_en', '').strip()
 
         # aliasy z BN, czyli referencja w 'stated as' będzie do BN, nie PSB
         self.aliasy = postac_dict.get('bn_400', [])
@@ -127,13 +127,13 @@ class Postac:
         self.bn_years = self.bn_years.replace('(','').replace(')','')
 
         # informacje do utworzenia referencji do PSB
-        self.volume = postac_dict.get('volume', '')
-        self.publ_year = postac_dict.get('publ_year', '')
-        self.page = postac_dict.get('page', '')
+        self.volume = postac_dict.get('volume', '').strip()
+        self.publ_year = postac_dict.get('publ_year', '').strip()
+        self.page = postac_dict.get('page', '').strip()
         if self.page and 's.' in self.page:
             self.page = self.page.replace('s.','').strip()
         self.autor = postac_dict.get('autor', [])
-        self.incipit = postac_dict.get('incipit', '')
+        self.incipit = postac_dict.get('incipit', '').strip()
 
         # identyfikatory
         self.plwabn_id = str(postac_dict.get("id_bn", '')).strip()
@@ -491,7 +491,7 @@ class Postac:
             # stated as
             for alias in self.aliasy:
                 # dodawać statement z językiem 'und' lub 'mul'
-                statement = MonolingualText(text=alias, language='und',
+                statement = MonolingualText(text=alias.strip(), language='und',
                                             prop_nr=P_STATED_AS, references=self.reference_bn)
                 self.wb_item.claims.add([statement], action_if_exists=ActionIfExists.FORCE_APPEND)
 
@@ -550,10 +550,8 @@ class Postac:
 
 
     def appears_in_wikibase(self) -> bool:
-        """ proste wyszukiwanie elementu w wikibase, dokładna zgodność imienia i nazwiska
-            oraz lata życia
+        """ proste wyszukiwanie elementu w wikibase, dokładna zgodność etykiety i opisu
         """
-        f_result = False
 
         items = wbi_helpers.search_entities(search_string=self.name,
                                              language='pl',
@@ -561,55 +559,13 @@ class Postac:
         for item in items:
             wbi_item = self.wbi.item.get(entity_id=item)
             item_label = wbi_item.labels.get(language='pl')
-            item_alias = wbi_item.aliases.get(language='pl')
             item_description_pl = wbi_item.descriptions.get(language='pl')
 
-            if ((item_label == self.name or (item_alias and self.name in item_alias)) and
-                (item_description_pl and item_description_pl == self.description_pl)):
+            if (item_label == self.name and item_description_pl and item_description_pl == self.description_pl):
                 self.qid = item
                 return True
 
-            # jeżeli nie ma pełnej zgodności z label i description, szukanie zgodności
-            # label i lat życia w statements
-            claim_dict = wbi_item.claims.get_json()
-
-            d_birth = []
-            if P_DATE_OF_BIRTH in claim_dict:
-                lista = wbi_item.claims.get(P_DATE_OF_BIRTH)
-
-                # uproszczenie, zakładam że w momencie importu mamy tylko po 1 dacie dla osoby
-                if lista:
-                    for birth_item in lista:
-                        if 'value' in birth_item.mainsnak.datavalue:
-                            d_birth.append(birth_item.mainsnak.datavalue['value']['time'][1:5])
-
-            d_death = []
-            if P_DATE_OF_DEATH in claim_dict:
-                lista = wbi_item.claims.get(P_DATE_OF_DEATH)
-                # uproszczenie, zakładam że w momencie mamy tylko po 1 dacie dla osoby
-                if lista:
-                    for death_item in lista:
-                        if 'value' in death_item.mainsnak.datavalue:
-                            d_death.append(death_item.mainsnak.datavalue['value']['time'][1:5])
-
-            # Jeżeli nie ma dat dokładnych to szukamy floruit
-            floruit = None
-            if not d_birth and not d_death and P_FLORUIT in claim_dict:
-                lista = wbi_item.claims.get(P_FLORUIT)
-                # uproszczenie, zakładam że w momencie mamy tylko po 1 dacie dla osoby
-                if lista:
-                    if 'value' in lista[0].mainsnak.datavalue:
-                        floruit = lista[0].mainsnak.datavalue['value']['time'][1:3]
-                        floruit = str(romenum.toRoman(int(floruit)))
-
-            if ((item_label == self.name or (item_alias and self.name in item_alias)) and
-                ((not d_birth and floruit and floruit in self.years) or self.date_of_birth[:4] in d_birth) and
-                ((not d_death and floruit and floruit in self.years) or self.date_of_death[:4] in d_death)):
-                f_result = True
-                self.qid = item
-                break
-
-        return f_result
+        return False
 
 
     def write_or_exit(self):
@@ -702,6 +658,10 @@ if __name__ == '__main__':
     with open(input_path, "r", encoding='utf-8') as f:
         json_data = json.load(f)
         for i, postac_record in enumerate(json_data['persons']):
+
+            # przetwarzanie partiami po 1000
+            if (i < 11001) or (i > 15000):
+                continue
 
             # utworzenie instancji obiektu postaci
             postac = Postac(postac_record, logger_object=logger, login_object=login_instance,

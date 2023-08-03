@@ -9,6 +9,7 @@ from wikibaseintegrator.wbi_enums import WikibaseDatePrecision
 class DateBDF:
     """ obługa daty urodzenia, śmierci lub flourit """
 
+    # uaktualnić dla instancji testowej/docelowej!
     P_SOURCING_CIRCUMSTANCES = 'P502'
     P_REFINE_DATE = 'P490'
     P_DATE_OF_BIRTH = 'P422'
