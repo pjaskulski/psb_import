@@ -660,7 +660,7 @@ if __name__ == '__main__':
         for i, postac_record in enumerate(json_data['persons']):
 
             # przetwarzanie partiami po 1000
-            if (i < 11001) or (i > 15000):
+            if (i < 25001):
                 continue
 
             # utworzenie instancji obiektu postaci

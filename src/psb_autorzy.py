@@ -69,26 +69,26 @@ class Autor:
         self.description_pl = author_dict.get('years', '')
         self.description_en = author_dict.get('years', '')
 
-        # opis polski złożony z lat życia i informacji o autorze z BN, przecinek
-        # po latach życia, bez kropki na końcu opisu
+        # opis polski złożony z lat życia i informacji o autorze z BN,
+        # bez kropki na końcu opisu
         tmp_description_pl = author_dict.get('bn_opis', '')
         if tmp_description_pl:
             first_char = tmp_description_pl[0].lower()
             tmp_description_pl = first_char + tmp_description_pl[1:]
             if tmp_description_pl.endswith('.'):
                 tmp_description_pl = tmp_description_pl[:-1]
-            self.description_pl += ', ' + tmp_description_pl
+            self.description_pl += ' ' + tmp_description_pl
             self.description_pl = self.description_pl.strip()
 
         # opis angielski złożony z lat życia i informacji o autorze z BN przetłumaczonych
-        # automatycznie, przecinek po latach życia, bez kropki na końcu opisu
+        # automatycznie, bez kropki na końcu opisu
         tmp_description_en = author_dict.get('description_en', '')
         if tmp_description_en:
             first_char = tmp_description_en[0].lower()
             tmp_description_en = first_char + tmp_description_en[1:]
             if tmp_description_en.endswith('.'):
                 tmp_description_en = tmp_description_en[:-1]
-            self.description_en += ', ' + tmp_description_en
+            self.description_en += ' ' + tmp_description_en
             self.description_en = self.description_en.strip()
 
         self.aliasy = author_dict.get('aliasy', [])
